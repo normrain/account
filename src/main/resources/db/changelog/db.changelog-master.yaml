@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/000_create_schema.sql
   - include:
       file: db/changelog/001_create_accounts_table.sql
+  - include:
+      file: db/changelog/002_create_balance_table.sql
