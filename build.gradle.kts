@@ -23,14 +23,17 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
-	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation:3.1.3")
+
 	implementation("org.liquibase:liquibase-core")
 	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2")
+
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.2")
 	testImplementation("org.springframework.amqp:spring-rabbit-test")

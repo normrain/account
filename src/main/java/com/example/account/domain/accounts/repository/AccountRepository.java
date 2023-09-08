@@ -17,13 +17,17 @@ public interface AccountRepository {
     List<Account> findAll();
 
     @Select(SELECT_FROM_ACCOUNT_WHERE_ID)
+    @Results(id = "companyResultMap", value = {
+            @Result(property = "country", column="country"),
+            @Result(property = "customerId", column = "customer_id")
+    })
     Account findById(UUID id);
 
-    @Insert("INSERT INTO account(country, customer_id, currency) " +
-            " VALUES (#{country}, #{customer_id}, #{currency})")
+    @Insert("INSERT INTO account(country, customer_id) " +
+            " VALUES (#{country}, #{customerId})" +
+            "RETURNING id")
+    @Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
     void insert(Account account);
 
-    @Update("Update book set title=#{title}, " +
-            " isbn=#{isbn}, description=#{description}, page=#{page}, price=#{price} where id=#{id}")
     UUID update(Account account);
 }

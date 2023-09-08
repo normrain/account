@@ -15,7 +15,7 @@ import java.util.UUID;
 @Builder
 public record AccountCreationRequest(
         @NonNull
-        UUID customerId,
+        Long customerId,
         @NonNull
         String country,
         @NonNull

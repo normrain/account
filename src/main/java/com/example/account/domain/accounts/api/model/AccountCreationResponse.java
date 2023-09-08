@@ -11,6 +11,6 @@ import java.util.UUID;
 @Builder
 public record AccountCreationResponse(
         UUID accountId,
-        UUID customerId,
+        Long customerId,
         List<Balance> balances
 ) {}
