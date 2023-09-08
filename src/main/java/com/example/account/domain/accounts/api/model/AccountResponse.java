@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Jacksonized
 @Builder
-public record AccountCreationResponse(
+public record AccountResponse(
         UUID accountId,
         Long customerId,
         List<Balance> balances

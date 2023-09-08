@@ -8,12 +8,11 @@ import lombok.extern.jackson.Jacksonized;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
-import java.util.UUID;
 
 @Validated
 @Jacksonized
 @Builder
-public record AccountCreationRequest(
+public record AccountRequest(
         @NonNull
         Long customerId,
         @NonNull

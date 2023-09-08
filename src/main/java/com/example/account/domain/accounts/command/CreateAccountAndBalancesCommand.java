@@ -1,8 +1,8 @@
 package com.example.account.domain.accounts.command;
 
 
-import com.example.account.domain.accounts.api.model.AccountCreationRequest;
-import com.example.account.domain.accounts.api.model.AccountCreationResponse;
+import com.example.account.domain.accounts.api.model.AccountRequest;
+import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.entity.Account;
 import com.example.account.domain.accounts.service.AccountService;
 import com.example.account.domain.balances.entity.Balance;
@@ -22,15 +22,15 @@ public class CreateAccountAndBalancesCommand {
     private final BalanceService balanceService;
 
 
-    public AccountCreationResponse execute(AccountCreationRequest accountCreationRequest) {
+    public AccountResponse execute(AccountRequest accountRequest) {
         Account createdAccount = accountService.createAccount(
                 Account.builder()
-                        .customerId(accountCreationRequest.customerId())
-                        .country(accountCreationRequest.country())
+                        .customerId(accountRequest.customerId())
+                        .country(accountRequest.country())
                         .build()
         );
         List<Balance> createdBalances = new ArrayList<>();
-        for(Currency currency : accountCreationRequest.currencies()) {
+        for(Currency currency : accountRequest.currencies()) {
             createdBalances.add(balanceService.createBalance(
                     Balance.builder()
                             .accountId(createdAccount.getId())
@@ -39,7 +39,7 @@ public class CreateAccountAndBalancesCommand {
             ));
         }
 
-        return AccountCreationResponse.builder()
+        return AccountResponse.builder()
                 .accountId(createdAccount.getId())
                 .customerId(createdAccount.getCustomerId())
                 .balances(createdBalances)
