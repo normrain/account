@@ -5,6 +5,8 @@ import com.example.account.domain.accounts.api.model.AccountRequest;
 import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.command.CreateAccountAndBalancesCommand;
 import com.example.account.domain.accounts.command.GetAccountCommand;
+import com.example.account.domain.transactions.api.model.TransactionResponse;
+import com.example.account.domain.transactions.command.GetTransactionsForAccountCommand;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -29,6 +32,7 @@ public class AccountController {
 
     private final CreateAccountAndBalancesCommand createAccountAndBalancesCommand;
     private final GetAccountCommand getAccountCommand;
+    private final GetTransactionsForAccountCommand getTransactionsForAccountCommand;
 
     @PostMapping(value = "/create")
     public AccountResponse createAccount(@RequestBody @Valid AccountRequest accountRequest){
@@ -38,5 +42,10 @@ public class AccountController {
     @GetMapping(value = "/{id}")
     public AccountResponse getAccount(@PathVariable UUID id) {
         return getAccountCommand.execute(id);
+    }
+
+    @GetMapping(value = "/{accountId}/transactions")
+    public List<TransactionResponse> getTransactions(@PathVariable UUID accountId) {
+        return getTransactionsForAccountCommand.execute(accountId);
     }
 }

@@ -17,10 +17,7 @@ public interface AccountRepository {
     List<Account> findAll();
 
     @Select(SELECT_FROM_ACCOUNT_WHERE_ID)
-    @Results(id = "companyResultMap", value = {
-            @Result(property = "country", column="country"),
-            @Result(property = "customerId", column = "customer_id")
-    })
+    @Result(property = "customerId", column = "customer_id")
     Account findById(UUID id);
 
     @Insert("INSERT INTO account(country, customer_id) " +
@@ -29,5 +26,4 @@ public interface AccountRepository {
     @Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
     void insert(Account account);
 
-    UUID update(Account account);
 }

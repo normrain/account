@@ -1,6 +1,7 @@
 package com.example.account.domain.accounts.api.model;
 
 import com.example.account.domain.balances.entity.Balance;
+import com.example.account.domain.balances.model.BalanceResponse;
 import lombok.Builder;
 import lombok.extern.jackson.Jacksonized;
 
@@ -12,5 +13,5 @@ import java.util.UUID;
 public record AccountResponse(
         UUID accountId,
         Long customerId,
-        List<Balance> balances
+        List<BalanceResponse> balances
 ) {}
