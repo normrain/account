@@ -1,5 +1,6 @@
 package com.example.account.domain.transactions.service;
 
+import com.example.account.domain.accounts.service.AccountService;
 import com.example.account.domain.balances.service.BalanceService;
 import com.example.account.domain.transactions.model.TransactionRequest;
 import com.example.account.domain.transactions.model.TransactionResponse;
@@ -7,6 +8,7 @@ import com.example.account.domain.transactions.entity.Transaction;
 import com.example.account.domain.transactions.repository.TransactionRepository;
 import com.example.account.entity.EventType;
 import com.example.account.exception.EntityNotFoundException;
+import com.example.account.exception.InvalidBalanceException;
 import com.example.account.service.RabbitMqSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,9 +24,12 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final BalanceService balanceService;
+    private final AccountService accountService;
     private final RabbitMqSenderService rabbitMqSenderService;
 
-    public TransactionResponse createTransaction(UUID accountId, TransactionRequest transactionRequest) throws EntityNotFoundException {
+    public TransactionResponse createTransaction(UUID accountId, TransactionRequest transactionRequest) throws InvalidBalanceException, EntityNotFoundException {
+        accountService.getAccountWithBalances(accountId);
+
         Transaction newTransaction = Transaction.builder()
                 .accountId(accountId)
                 .amount(transactionRequest.amount())
@@ -55,7 +60,9 @@ public class TransactionService {
                 .build();
     }
 
-    public List<TransactionResponse> getTransactionsForAccount(UUID accountId) {
+    public List<TransactionResponse> getTransactionsForAccount(UUID accountId) throws EntityNotFoundException {
+        accountService.getAccountWithBalances(accountId);
+
         List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
         return transactions.stream()
                 .map( transaction -> TransactionResponse.builder()

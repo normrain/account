@@ -7,7 +7,7 @@ import com.example.account.domain.balances.repository.BalanceRepository;
 import com.example.account.entity.Currency;
 import com.example.account.entity.Direction;
 import com.example.account.entity.EventType;
-import com.example.account.exception.EntityNotFoundException;
+import com.example.account.exception.InvalidBalanceException;
 import com.example.account.service.RabbitMqSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,10 +47,10 @@ public class BalanceService {
         }
     }
 
-    public BigDecimal updateAccountBalance(UUID accountId, BigDecimal amount, Direction direction, Currency currency) throws EntityNotFoundException {
+    public BigDecimal updateAccountBalance(UUID accountId, BigDecimal amount, Direction direction, Currency currency) throws InvalidBalanceException {
         Balance balance = balanceRepository.findByAccountIdAndCurrency(accountId, currency);
         if(balance == null) {
-            throw new EntityNotFoundException("Balance for Account", accountId);
+            throw new InvalidBalanceException("Balance does not exist", accountId, currency, null);
         }
         BigDecimal newBalanceAmount = BigDecimal.ZERO;
 
@@ -59,6 +59,14 @@ public class BalanceService {
         }
         if (direction == Direction.OUT) {
             newBalanceAmount = balance.getBalance().subtract(amount).setScale(2, RoundingMode.HALF_UP);
+        }
+        if(newBalanceAmount.compareTo(BigDecimal.ZERO) < 0){
+            throw new InvalidBalanceException(
+                    "Insufficient Funds",
+                    accountId,
+                    currency,
+                    balance.getId()
+            );
         }
         rabbitMqSenderService.sendMessageToQueue(balance.getId(), EventType.UPDATE);
         balanceRepository.updateBalance(balance.getId(), newBalanceAmount);

@@ -8,6 +8,7 @@ import com.example.account.domain.transactions.model.TransactionRequest;
 import com.example.account.domain.transactions.model.TransactionResponse;
 import com.example.account.domain.transactions.service.TransactionService;
 import com.example.account.exception.EntityNotFoundException;
+import com.example.account.exception.InvalidBalanceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,17 +39,17 @@ public class AccountController {
     public TransactionResponse createTransaction(
             @PathVariable UUID accountId,
             @RequestBody @Valid TransactionRequest transactionRequest
-    ) throws EntityNotFoundException {
+    ) throws InvalidBalanceException, EntityNotFoundException {
         return transactionService.createTransaction(accountId, transactionRequest);
     }
 
     @GetMapping(value = "/{accountId}")
-    public AccountResponse getAccount(@PathVariable UUID accountId) throws EntityNotFoundException {
+    public AccountResponse getAccount(@PathVariable @Valid UUID accountId) throws EntityNotFoundException {
         return accountService.getAccountWithBalances(accountId);
     }
 
     @GetMapping(value = "/{accountId}/transactions")
-    public List<TransactionResponse> getTransactions(@PathVariable UUID accountId) {
+    public List<TransactionResponse> getTransactions(@PathVariable @Valid UUID accountId) throws EntityNotFoundException {
         return transactionService.getTransactionsForAccount(accountId);
     }
 
