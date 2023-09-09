@@ -3,6 +3,7 @@ package com.example.account.domain.accounts.api.model;
 import com.example.account.domain.balances.entity.Balance;
 import com.example.account.domain.balances.model.BalanceResponse;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;

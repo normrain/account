@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/002_create_balance_table.sql
   - include:
       file: db/changelog/003_create_transaction_table.sql
+  - include:
+      file: db/changelog/004_create_log_table.sql

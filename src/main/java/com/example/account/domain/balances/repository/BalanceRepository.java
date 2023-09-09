@@ -26,7 +26,7 @@ public interface BalanceRepository {
     Balance findById(UUID id);
 
     @Select("select * from balance where account_id = #{id}")
-    List<Balance> findByBalanceId(UUID accountID);
+    List<Balance> findByAccountId(UUID accountID);
 
     @Select("select * from balance where account_id = #{accountId} and currency = #{currency}")
     @Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
@@ -37,5 +37,5 @@ public interface BalanceRepository {
     void insert(Balance balance);
 
     @Update("Update balance set balance=#{balance} where id=#{id}")
-    void updateAmount(UUID id, BigDecimal balance);
+    void updateBalance(UUID id, BigDecimal balance);
 }

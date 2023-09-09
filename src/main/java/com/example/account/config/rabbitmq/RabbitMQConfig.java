@@ -68,7 +68,7 @@ public class RabbitMQConfig {
         return connectionFactory;
     }
     @Bean
-    public AmqpTemplate rabbit1Template(ConnectionFactory connectionFactory) {
+    public AmqpTemplate rabbitAmqTemplate(ConnectionFactory connectionFactory) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setDefaultReceiveQueue(queueName);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
@@ -99,8 +99,7 @@ public class RabbitMQConfig {
         private final Logger logger = LogManager.getLogger(getClass());
         @Override
         public boolean isFatal(Throwable t) {
-            if (t instanceof ListenerExecutionFailedException) {
-                ListenerExecutionFailedException lefe = (ListenerExecutionFailedException) t;
+            if (t instanceof ListenerExecutionFailedException lefe) {
                 logger.error("Failed to process inbound message from queue "
                         + lefe.getFailedMessage().getMessageProperties().getConsumerQueue()
                         + "; failed message: " + lefe.getFailedMessage(), t);

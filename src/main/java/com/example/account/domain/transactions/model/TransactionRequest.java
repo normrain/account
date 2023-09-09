@@ -1,4 +1,4 @@
-package com.example.account.domain.transactions.api.model;
+package com.example.account.domain.transactions.model;
 
 import com.example.account.entity.Currency;
 import com.example.account.entity.Direction;
@@ -13,7 +13,6 @@ import java.util.UUID;
 @Jacksonized
 @Builder
 public record TransactionRequest(
-        UUID accountId,
         BigDecimal amount,
         Currency currency,
         Direction direction,

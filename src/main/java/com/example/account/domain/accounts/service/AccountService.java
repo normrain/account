@@ -1,26 +1,68 @@
 package com.example.account.domain.accounts.service;
 
+import com.example.account.domain.accounts.api.model.AccountRequest;
+import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.entity.Account;
 import com.example.account.domain.accounts.repository.AccountRepository;
+import com.example.account.domain.balances.model.BalanceResponse;
+import com.example.account.domain.balances.service.BalanceService;
+import com.example.account.domain.logs.entity.EventLog;
+import com.example.account.entity.EventType;
+import com.example.account.service.RabbitMqSenderService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class AccountService {
 
-    private final AccountRepository accountRepository;
 
-    public Account createAccount(Account account){
-        accountRepository.insert(account);
-        return accountRepository.findById(account.getId());
+    private final BalanceService balanceService;
+    private final AccountRepository accountRepository;
+    private final RabbitMqSenderService rabbitMqSenderService;
+
+    public AccountResponse createAccountAndBalances(AccountRequest accountRequest) throws JsonProcessingException {
+
+        Account newAccount = Account.builder()
+                .customerId(accountRequest.customerId())
+                .country(accountRequest.country())
+                .build();
+
+        accountRepository.insert(newAccount);
+
+        balanceService.createBalancesForAccount(newAccount.getId(), accountRequest.currencies());
+
+        List<BalanceResponse> balances = balanceService.getBalancesForAccount(newAccount.getId());
+
+        AccountResponse response = AccountResponse.builder()
+                .accountId(newAccount.getId())
+                .customerId(newAccount.getCustomerId())
+                .balances(balances)
+                .build();
+
+        rabbitMqSenderService.sendMessageToQueue(newAccount.getId(), EventType.CREATION);
+
+        return response;
     }
 
-    public Account getAccount(UUID id) {
+    public AccountResponse getAccountWithBalances(UUID id) {
+        Account account = accountRepository.findById(id);
+        List<BalanceResponse> balances = balanceService.getBalancesForAccount(id);
 
-        return accountRepository.findById(id);
+        if(account == null) {
+            return null;
+        }
+        return AccountResponse.builder()
+                .accountId(account.getId())
+                .customerId(account.getCustomerId())
+                .balances(balances)
+                .build();
     }
 }

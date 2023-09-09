@@ -3,23 +3,20 @@ package com.example.account.domain.accounts.api.controller;
 
 import com.example.account.domain.accounts.api.model.AccountRequest;
 import com.example.account.domain.accounts.api.model.AccountResponse;
-import com.example.account.domain.accounts.command.CreateAccountAndBalancesCommand;
-import com.example.account.domain.accounts.command.GetAccountCommand;
-import com.example.account.domain.transactions.api.model.TransactionResponse;
-import com.example.account.domain.transactions.command.GetTransactionsForAccountCommand;
+import com.example.account.domain.accounts.service.AccountService;
+import com.example.account.domain.transactions.model.TransactionRequest;
+import com.example.account.domain.transactions.model.TransactionResponse;
+import com.example.account.domain.transactions.service.TransactionService;
+import com.example.account.exception.AccountNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,22 +29,34 @@ import java.util.UUID;
 @RequestMapping(path = "/api/v1/account")
 public class AccountController {
 
-    private final CreateAccountAndBalancesCommand createAccountAndBalancesCommand;
-    private final GetAccountCommand getAccountCommand;
-    private final GetTransactionsForAccountCommand getTransactionsForAccountCommand;
+    private final AccountService accountService;
+    private final TransactionService transactionService;
 
     @PostMapping(value = "/create")
-    public AccountResponse createAccount(@RequestBody @Valid AccountRequest accountRequest){
-        return createAccountAndBalancesCommand.execute(accountRequest);
+    public AccountResponse createAccount(@RequestBody @Valid AccountRequest accountRequest) throws JsonProcessingException {
+        return accountService.createAccountAndBalances(accountRequest);
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<AccountResponse> getAccount(@PathVariable UUID id) {
-        return new ResponseEntity<>(getAccountCommand.execute(id), HttpStatus.valueOf(200));
+    @PostMapping("/{accountId}/transactions/create")
+    public TransactionResponse createTransaction(@PathVariable UUID accountId, @RequestBody @Valid TransactionRequest transactionRequest){
+        return transactionService.createTransaction(accountId, transactionRequest);
+    }
+
+    @GetMapping(value = "/{accountId}")
+    public AccountResponse getAccount(@PathVariable UUID accountId) {
+        return accountService.getAccountWithBalances(accountId);
     }
 
     @GetMapping(value = "/{accountId}/transactions")
     public List<TransactionResponse> getTransactions(@PathVariable UUID accountId) {
-        return getTransactionsForAccountCommand.execute(accountId);
+        return transactionService.getTransactionsForAccount(accountId);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(
+                ex.getMessage()
+        );
     }
 }
