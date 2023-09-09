@@ -6,6 +6,7 @@ import com.example.account.domain.transactions.model.TransactionResponse;
 import com.example.account.domain.transactions.entity.Transaction;
 import com.example.account.domain.transactions.repository.TransactionRepository;
 import com.example.account.entity.EventType;
+import com.example.account.exception.EntityNotFoundException;
 import com.example.account.service.RabbitMqSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class TransactionService {
     private final BalanceService balanceService;
     private final RabbitMqSenderService rabbitMqSenderService;
 
-    public TransactionResponse createTransaction(UUID accountId, TransactionRequest transactionRequest) {
+    public TransactionResponse createTransaction(UUID accountId, TransactionRequest transactionRequest) throws EntityNotFoundException {
         Transaction newTransaction = Transaction.builder()
                 .accountId(accountId)
                 .amount(transactionRequest.amount())

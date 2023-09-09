@@ -7,6 +7,7 @@ import com.example.account.domain.balances.repository.BalanceRepository;
 import com.example.account.entity.Currency;
 import com.example.account.entity.Direction;
 import com.example.account.entity.EventType;
+import com.example.account.exception.EntityNotFoundException;
 import com.example.account.service.RabbitMqSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,8 +47,11 @@ public class BalanceService {
         }
     }
 
-    public BigDecimal updateAccountBalance(UUID accountId, BigDecimal amount, Direction direction, Currency currency){
+    public BigDecimal updateAccountBalance(UUID accountId, BigDecimal amount, Direction direction, Currency currency) throws EntityNotFoundException {
         Balance balance = balanceRepository.findByAccountIdAndCurrency(accountId, currency);
+        if(balance == null) {
+            throw new EntityNotFoundException("Balance for Account", accountId);
+        }
         BigDecimal newBalanceAmount = BigDecimal.ZERO;
 
         if (direction == Direction.IN) {

@@ -7,14 +7,11 @@ import com.example.account.domain.accounts.service.AccountService;
 import com.example.account.domain.transactions.model.TransactionRequest;
 import com.example.account.domain.transactions.model.TransactionResponse;
 import com.example.account.domain.transactions.service.TransactionService;
-import com.example.account.exception.AccountNotFoundException;
+import com.example.account.exception.EntityNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,12 +35,15 @@ public class AccountController {
     }
 
     @PostMapping("/{accountId}/transactions/create")
-    public TransactionResponse createTransaction(@PathVariable UUID accountId, @RequestBody @Valid TransactionRequest transactionRequest){
+    public TransactionResponse createTransaction(
+            @PathVariable UUID accountId,
+            @RequestBody @Valid TransactionRequest transactionRequest
+    ) throws EntityNotFoundException {
         return transactionService.createTransaction(accountId, transactionRequest);
     }
 
     @GetMapping(value = "/{accountId}")
-    public AccountResponse getAccount(@PathVariable UUID accountId) {
+    public AccountResponse getAccount(@PathVariable UUID accountId) throws EntityNotFoundException {
         return accountService.getAccountWithBalances(accountId);
     }
 
@@ -52,11 +52,4 @@ public class AccountController {
         return transactionService.getTransactionsForAccount(accountId);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException ex) {
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(
-                ex.getMessage()
-        );
-    }
 }

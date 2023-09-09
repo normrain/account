@@ -6,14 +6,11 @@ import com.example.account.domain.accounts.entity.Account;
 import com.example.account.domain.accounts.repository.AccountRepository;
 import com.example.account.domain.balances.model.BalanceResponse;
 import com.example.account.domain.balances.service.BalanceService;
-import com.example.account.domain.logs.entity.EventLog;
 import com.example.account.entity.EventType;
+import com.example.account.exception.EntityNotFoundException;
 import com.example.account.service.RabbitMqSenderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,13 +49,14 @@ public class AccountService {
         return response;
     }
 
-    public AccountResponse getAccountWithBalances(UUID id) {
+    public AccountResponse getAccountWithBalances(UUID id) throws EntityNotFoundException {
         Account account = accountRepository.findById(id);
         List<BalanceResponse> balances = balanceService.getBalancesForAccount(id);
 
         if(account == null) {
-            return null;
+            throw new EntityNotFoundException("Account", id);
         }
+
         return AccountResponse.builder()
                 .accountId(account.getId())
                 .customerId(account.getCustomerId())
