@@ -1,7 +1,6 @@
 package com.example.account.domain.balances.command;
 
 import com.example.account.domain.balances.entity.Balance;
-import com.example.account.domain.balances.model.BalanceResponse;
 import com.example.account.domain.balances.service.BalanceService;
 import com.example.account.entity.Currency;
 import com.example.account.entity.Direction;
@@ -9,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

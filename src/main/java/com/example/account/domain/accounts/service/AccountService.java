@@ -5,6 +5,7 @@ import com.example.account.domain.accounts.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class AccountService {
     }
 
     public Account getAccount(UUID id) {
+
         return accountRepository.findById(id);
     }
 }

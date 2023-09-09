@@ -10,6 +10,8 @@ import com.example.account.domain.transactions.command.GetTransactionsForAccount
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +42,8 @@ public class AccountController {
     }
 
     @GetMapping(value = "/{id}")
-    public AccountResponse getAccount(@PathVariable UUID id) {
-        return getAccountCommand.execute(id);
+    public ResponseEntity<AccountResponse> getAccount(@PathVariable UUID id) {
+        return new ResponseEntity<>(getAccountCommand.execute(id), HttpStatus.valueOf(200));
     }
 
     @GetMapping(value = "/{accountId}/transactions")

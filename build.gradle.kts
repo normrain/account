@@ -25,6 +25,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation:3.1.3")
+	implementation("org.springframework.amqp:spring-amqp:3.0.8")
+
 
 	implementation("org.liquibase:liquibase-core")
 	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2")

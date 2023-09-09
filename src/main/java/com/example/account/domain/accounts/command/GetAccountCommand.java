@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -18,11 +19,11 @@ import java.util.UUID;
 public class GetAccountCommand {
 
     private final AccountService accountService;
-    private final BalanceService balanceService;
     private final GetBalancesForAccountCommand getBalancesForAccountCommand;
 
     public AccountResponse execute(UUID id) {
         Account account = accountService.getAccount(id);
+
         List<BalanceResponse> balances = getBalancesForAccountCommand.execute(id);
         return AccountResponse.builder()
                 .accountId(account.getId())

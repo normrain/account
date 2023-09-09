@@ -8,9 +8,11 @@ services:
     ports:
       - 6432:5432
   rabbitmq:
-    image: 'rabbitmq:latest'
+    image: 'rabbitmq:3-management-alpine'
+    container_name: 'rabbitmq'
     environment:
       - 'RABBITMQ_DEFAULT_PASS=secret'
       - 'RABBITMQ_DEFAULT_USER=myuser'
     ports:
-      - '5672'
+      - "15672:15672"
+      - "5672:5672"
