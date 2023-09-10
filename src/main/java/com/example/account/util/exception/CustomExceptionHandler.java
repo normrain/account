@@ -1,4 +1,4 @@
-package com.example.account.exception;
+package com.example.account.util.exception;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -32,7 +32,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST,
                 String.format("Error: Field %s -- %s",
                 Objects.requireNonNull(ex.getFieldError()).getField(),
@@ -44,12 +43,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleEntityNotFound(
             EntityNotFoundException ex) {
         ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
+
         return buildResponseEntity(apiError);
     }
     @ExceptionHandler(InvalidBalanceException.class)
     public ResponseEntity<Object> handleInvalid(
             InvalidBalanceException ex) {
         ApiError apiError = new ApiError(BAD_REQUEST, ex.getMessage());
+
         return buildResponseEntity(apiError);
     }
 

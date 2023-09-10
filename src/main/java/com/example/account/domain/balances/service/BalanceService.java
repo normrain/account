@@ -4,10 +4,10 @@ package com.example.account.domain.balances.service;
 import com.example.account.domain.balances.entity.Balance;
 import com.example.account.domain.balances.model.BalanceResponse;
 import com.example.account.domain.balances.repository.BalanceRepository;
-import com.example.account.entity.Currency;
-import com.example.account.entity.Direction;
-import com.example.account.entity.EventType;
-import com.example.account.exception.InvalidBalanceException;
+import com.example.account.util.enums.Currency;
+import com.example.account.util.enums.Direction;
+import com.example.account.util.enums.EventType;
+import com.example.account.util.exception.InvalidBalanceException;
 import com.example.account.service.RabbitMqSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,13 +36,14 @@ public class BalanceService {
     }
 
     public void createBalancesForAccount(UUID accountId, List<Currency> currencies){
+        System.out.println("HERE");
         for (Currency currency : currencies) {
             Balance newBalance = Balance.builder()
                     .accountId(accountId)
                     .currency(currency)
                     .build();
             balanceRepository.insert(newBalance);
-
+            System.out.println("HERE");
             rabbitMqSenderService.sendMessageToQueue(newBalance.getId(), EventType.CREATION);
         }
     }

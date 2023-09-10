@@ -1,7 +1,7 @@
 package com.example.account.domain.transactions.model;
 
-import com.example.account.entity.Currency;
-import com.example.account.entity.Direction;
+import com.example.account.util.enums.Currency;
+import com.example.account.util.enums.Direction;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.extern.jackson.Jacksonized;

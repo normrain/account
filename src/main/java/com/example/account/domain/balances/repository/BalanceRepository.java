@@ -1,7 +1,7 @@
 package com.example.account.domain.balances.repository;
 
 import com.example.account.domain.balances.entity.Balance;
-import com.example.account.entity.Currency;
+import com.example.account.util.enums.Currency;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;

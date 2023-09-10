@@ -1,4 +1,4 @@
-package com.example.account.entity;
+package com.example.account.util.enums;
 
 public enum EventType {
     CREATION,

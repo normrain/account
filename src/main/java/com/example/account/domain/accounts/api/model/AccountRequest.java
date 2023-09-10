@@ -1,7 +1,7 @@
 package com.example.account.domain.accounts.api.model;
 
 
-import com.example.account.entity.Currency;
+import com.example.account.util.enums.Currency;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

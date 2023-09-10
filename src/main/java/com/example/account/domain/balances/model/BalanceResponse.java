@@ -1,6 +1,6 @@
 package com.example.account.domain.balances.model;
 
-import com.example.account.entity.Currency;
+import com.example.account.util.enums.Currency;
 import lombok.Builder;
 import lombok.extern.jackson.Jacksonized;
 import org.springframework.validation.annotation.Validated;

@@ -1,4 +1,4 @@
-package com.example.account.config.typehandler;
+package com.example.account.util.typehandler;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

@@ -27,7 +27,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation:3.1.3")
 	implementation("org.springframework.amqp:spring-amqp:3.0.8")
 
-
 	implementation("org.liquibase:liquibase-core")
 	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2")
 
@@ -40,6 +39,15 @@ dependencies {
 	testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.2")
 	testImplementation("org.springframework.amqp:spring-rabbit-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("junit:junit:4.13.1")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+	// https://mvnrepository.com/artifact/org.testcontainers/testcontainers
+	testImplementation("org.testcontainers:testcontainers:1.19.0")
+// https://mvnrepository.com/artifact/org.testcontainers/postgresql
+	testImplementation("org.testcontainers:postgresql:1.19.0")
+
+
+
 }
 
 tasks.withType<Test> {

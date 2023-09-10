@@ -1,6 +1,6 @@
 package com.example.account.domain.logs.entity;
 
-import com.example.account.entity.EventType;
+import com.example.account.util.enums.EventType;
 import lombok.*;
 
 import java.util.UUID;

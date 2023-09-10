@@ -1,7 +1,7 @@
 package com.example.account.service;
 
 import com.example.account.domain.logs.entity.EventLog;
-import com.example.account.entity.EventType;
+import com.example.account.util.enums.EventType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

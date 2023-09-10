@@ -1,4 +1,4 @@
-package com.example.account.exception;
+package com.example.account.util.exception;
 
 import lombok.Getter;
 import lombok.Setter;

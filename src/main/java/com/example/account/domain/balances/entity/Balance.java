@@ -1,6 +1,6 @@
 package com.example.account.domain.balances.entity;
 
-import com.example.account.entity.Currency;
+import com.example.account.util.enums.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

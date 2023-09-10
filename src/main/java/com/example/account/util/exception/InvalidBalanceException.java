@@ -1,6 +1,6 @@
-package com.example.account.exception;
+package com.example.account.util.exception;
 
-import com.example.account.entity.Currency;
+import com.example.account.util.enums.Currency;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
