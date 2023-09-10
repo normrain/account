@@ -51,7 +51,6 @@ public class AccountControllerIntegrationTest {
 
     @Test
     public void testCreateAccount() throws Exception {
-        // Create a sample AccountRequest
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         AccountRequest accountRequest = new AccountRequest(customerId, "NL", Arrays.asList(Currency.USD, Currency.EUR));
 
@@ -97,7 +96,6 @@ public class AccountControllerIntegrationTest {
 
     @Test
     public void testGetTransactions() throws Exception {
-        // Create a sample account and retrieve its ID
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         AccountRequest accountRequest = new AccountRequest(customerId, "EE", Arrays.asList(Currency.USD, Currency.EUR));
         String response = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/account/create")

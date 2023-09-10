@@ -36,14 +36,12 @@ public class BalanceService {
     }
 
     public void createBalancesForAccount(UUID accountId, List<Currency> currencies){
-        System.out.println("HERE");
         for (Currency currency : currencies) {
             Balance newBalance = Balance.builder()
                     .accountId(accountId)
                     .currency(currency)
                     .build();
             balanceRepository.insert(newBalance);
-            System.out.println("HERE");
             rabbitMqSenderService.sendMessageToQueue(newBalance.getId(), EventType.CREATION);
         }
     }

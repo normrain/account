@@ -26,9 +26,6 @@ public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestConta
         System.setProperty("DB_URL", container.getJdbcUrl().substring(0,17));
         System.setProperty("DB_USERNAME", container.getUsername());
         System.setProperty("DB_PASSWORD", container.getPassword());
-        System.out.println(container.getJdbcUrl());
-        System.out.println(container.getUsername());
-        System.out.println(container.getPassword());
     }
 
     @Override
