@@ -1,9 +1,6 @@
 package com.example.account;
 
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
@@ -19,15 +16,19 @@ public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestConta
         if (container == null) {
             container = new PostgresTestContainer();
         }
+
         return container;
     }
 
     @Override
     public void start() {
         super.start();
-        System.setProperty("DB_URL", container.getJdbcUrl());
+        System.setProperty("DB_URL", container.getJdbcUrl().substring(0,17));
         System.setProperty("DB_USERNAME", container.getUsername());
         System.setProperty("DB_PASSWORD", container.getPassword());
+        System.out.println(container.getJdbcUrl());
+        System.out.println(container.getUsername());
+        System.out.println(container.getPassword());
     }
 
     @Override

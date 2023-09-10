@@ -26,7 +26,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation:3.1.3")
 	implementation("org.springframework.amqp:spring-amqp:3.0.8")
-
+	implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 	implementation("org.liquibase:liquibase-core")
 	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2")
 
@@ -46,9 +46,6 @@ dependencies {
 	testImplementation("org.testcontainers:postgresql:1.19.0")
 	testImplementation("org.testcontainers:junit-jupiter:1.19.0")
 	testImplementation("org.testcontainers:rabbitmq:1.19.0")
-
-
-
 
 }
 
