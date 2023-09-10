@@ -21,8 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,7 +38,6 @@ public class BalanceServiceTest {
 
     @Test
     public void testGetBalancesForAccount() {
-        // Arrange
         UUID accountId = UUID.randomUUID();
         List<Balance> balances = Arrays.asList(
                 new Balance(UUID.randomUUID(), accountId, BigDecimal.valueOf(100.00), Currency.USD),
@@ -48,10 +46,8 @@ public class BalanceServiceTest {
 
         when(balanceRepository.findByAccountId(accountId)).thenReturn(balances);
 
-        // Act
         List<BalanceResponse> result = balanceService.getBalancesForAccount(accountId);
 
-        // Assert
         assertNotNull(result);
         assertEquals(balances.size(), result.size());
         assertEquals(Currency.USD, result.get(0).currency());
@@ -62,46 +58,35 @@ public class BalanceServiceTest {
 
     @Test
     public void testCreateBalancesForAccount() {
-        // Arrange
         UUID accountId = UUID.randomUUID();
         List<Currency> currencies = List.of(Currency.USD, Currency.EUR);
 
-        // Act
         balanceService.createBalancesForAccount(accountId, currencies);
 
-        // Assert
-        // You can't easily assert the insert operation, as it's void. You should check if the mocking of balanceRepository.insert and rabbitMqSenderService.sendMessageToQueue occurred instead.
         verify(balanceRepository, times(2)).insert(any());
         verify(rabbitMqSenderService, times(2)).sendMessageToQueue(any(), eq(EventType.CREATION));
     }
 
     @Test
     public void testUpdateAccountBalance() throws InvalidBalanceException {
-        // Arrange
         UUID accountId = UUID.randomUUID();
         Currency currency = Currency.USD;
         Balance balance = new Balance(UUID.randomUUID(), accountId, BigDecimal.valueOf(100.00), currency);
 
         when(balanceRepository.findByAccountIdAndCurrency(accountId, currency)).thenReturn(balance);
-
-
         BigDecimal amount = BigDecimal.valueOf(50.00);
 
-        // Act
         BigDecimal newBalanceAmount = balanceService.updateAccountBalance(accountId, amount, Direction.IN, currency);
 
-        // Assert
         assertNotNull(newBalanceAmount);
         assertEquals(BigDecimal.valueOf(150.00).setScale(2, RoundingMode.HALF_UP), newBalanceAmount);
 
-        // Verify that sendMessageToQueue and updateBalance were called once
         verify(rabbitMqSenderService, times(1)).sendMessageToQueue(balance.getId(), EventType.UPDATE);
         verify(balanceRepository, times(1)).updateBalance(balance.getId(), newBalanceAmount);
     }
 
     @Test(expected = InvalidBalanceException.class)
     public void testUpdateAccountBalanceInsufficientFunds() throws InvalidBalanceException {
-        // Arrange
         UUID accountId = UUID.randomUUID();
         Currency currency = Currency.USD;
         Balance balance = new Balance(UUID.randomUUID(), accountId, BigDecimal.valueOf(100.00), currency);
@@ -110,7 +95,6 @@ public class BalanceServiceTest {
 
         BigDecimal amount = BigDecimal.valueOf(200.00);
 
-        // Act and Assert
         balanceService.updateAccountBalance(accountId, amount, Direction.OUT, currency);
     }
 }

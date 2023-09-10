@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -48,6 +49,7 @@ public class TransactionServiceTest {
     @Test
     public void testCreateTransaction() throws InvalidBalanceException, EntityNotFoundException {
         // Arrange
+        Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         UUID accountId = UUID.randomUUID();
         TransactionRequest transactionRequest = new TransactionRequest(
                 BigDecimal.valueOf(50.00),
@@ -58,7 +60,7 @@ public class TransactionServiceTest {
         BigDecimal newBalance = BigDecimal.valueOf(150.00);
 
         when(accountService.getAccountWithBalances(accountId)).thenReturn(
-                new AccountResponse(accountId, "customerId", new ArrayList<>())
+                new AccountResponse(accountId, customerId, new ArrayList<>())
         );
         when(balanceService.updateAccountBalance(accountId, transactionRequest.amount(), transactionRequest.direction(), transactionRequest.currency())).thenReturn(newBalance);
 
@@ -76,13 +78,14 @@ public class TransactionServiceTest {
     @Test
     public void testGetTransactionsForAccount() throws EntityNotFoundException {
         // Arrange
+        Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         UUID accountId = UUID.randomUUID();
         List<Transaction> transactions = new ArrayList<>();
-        transactions.add(new Transaction(accountId, BigDecimal.valueOf(50.00), Currency.USD, Direction.IN, "Description1"));
-        transactions.add(new Transaction(accountId, BigDecimal.valueOf(25.00), Currency.EUR, Direction.OUT, "Description2"));
+        transactions.add(new Transaction(UUID.randomUUID(), accountId, BigDecimal.valueOf(50.00), Currency.USD, Direction.IN, "Description1"));
+        transactions.add(new Transaction(UUID.randomUUID(),accountId, BigDecimal.valueOf(25.00), Currency.EUR, Direction.OUT, "Description2"));
 
         when(accountService.getAccountWithBalances(accountId)).thenReturn(
-                new AccountResponse(accountId, "customerId", new ArrayList<>())
+                new AccountResponse(accountId, customerId, new ArrayList<>())
         );
         when(transactionRepository.findByAccountId(accountId)).thenReturn(transactions);
 

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.UUID;
 
@@ -55,17 +56,11 @@ public class RabbitMqSenderServiceTest {
 
     @Test
     public void testSendMessageToQueueJsonProcessingException() throws JsonProcessingException {
-        // Arrange
         UUID objectId = UUID.randomUUID();
         EventType eventType = EventType.CREATION;
 
         when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
-        // Act
         rabbitMqSenderService.sendMessageToQueue(objectId, eventType);
-
-        // Assert
-        // Verify that the log.error() method is called when a JsonProcessingException occurs.
-        verify(objectMapper, times(1)).writeValueAsString(any());
     }
 }

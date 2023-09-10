@@ -1,5 +1,7 @@
 package com.example.account.integration;
 
+import com.example.account.PostgresTestContainer;
+import com.example.account.RabbitTestContainer;
 import com.example.account.domain.accounts.api.model.AccountRequest;
 import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.entity.Account;
@@ -11,28 +13,44 @@ import com.example.account.util.enums.EventType;
 import com.example.account.util.exception.EntityNotFoundException;
 import com.example.account.service.RabbitMqSenderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
-import static org.hamcrest.Matchers.any;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
 public class AccountServiceIntegrationTest {
+
+    @ClassRule
+    public static PostgreSQLContainer<PostgresTestContainer> postgreSQLContainer = PostgresTestContainer.getInstance();
+    @ClassRule
+    public static RabbitTestContainer rabbitTestContainer = RabbitTestContainer.getInstance();
 
     @Autowired
     private AccountService accountService;
@@ -43,44 +61,37 @@ public class AccountServiceIntegrationTest {
     @Autowired
     private BalanceService balanceService;
 
-    @Autowired
+    @MockBean
     private RabbitMqSenderService rabbitMqSenderService;
 
     @Test
     public void testCreateAccountAndBalances() throws JsonProcessingException {
-        // Set up test data
-        AccountRequest accountRequest = new AccountRequest("customerId", "country", Arrays.asList(Currency.USD, Currency.EUR));
+        Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
+        AccountRequest accountRequest = new AccountRequest(customerId, "NL", Arrays.asList(Currency.USD, Currency.EUR));
 
-        // Call the method to be tested
         AccountResponse response = accountService.createAccountAndBalances(accountRequest);
 
-        // Retrieve the account from the database using accountRepository
         Account account = accountRepository.findById(response.accountId());
 
-        // Assert the results
         assertNotNull(response);
         assertNotNull(account);
-        // Add more assertions as needed
 
-        // Verify interactions with balanceService and rabbitMqSenderService using Mockito
-        verify(balanceService, times(1)).createBalancesForAccount(any(UUID.class), anyList());
-        verify(rabbitMqSenderService, times(1)).sendMessageToQueue(any(UUID.class), eq(EventType.CREATION));
+        verify(rabbitMqSenderService, times(3)).sendMessageToQueue(any(), eq(EventType.CREATION));
     }
 
     @Test
     public void testGetAccountWithBalances() throws EntityNotFoundException {
         // Set up test data in the database using accountRepository
-        UUID accountId = UUID.randomUUID();
-        Account account = new Account(accountId, "customerId", "country");
-        accountRepository.save(account);
+        Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
+        Account account = new Account(null, "NL", customerId);
+        accountRepository.insert(account);
 
-        // Call the method to be tested
-        AccountResponse response = accountService.getAccountWithBalances(accountId);
+        AccountResponse response = accountService.getAccountWithBalances(account.getId());
 
-        // Assert the results
         assertNotNull(response);
-        assertEquals(accountId, response.accountId());
-        // Add more assertions as needed
+        assertEquals(response.accountId(), account.getId());
+        assertEquals(response.customerId(),account.getCustomerId());
+        assertEquals(response.balances(), List.of());
     }
 
     // Additional integration tests as needed for error cases, edge cases, etc.

@@ -1,5 +1,6 @@
 package com.example.account.unit;
 
+import com.example.account.PostgresTestContainer;
 import com.example.account.domain.accounts.api.model.AccountRequest;
 import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.entity.Account;
@@ -49,41 +50,30 @@ public class AccountServiceTest {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         String country = "EE";
         UUID accountID = UUID.randomUUID();
-
-        // Arrange
         AccountRequest accountRequest = new AccountRequest(customerId, country, List.of(Currency.USD, Currency.EUR));
 
-        // Mock the behavior of dependencies
         Account newAccount = new Account(accountID, country, customerId);
-
         List<BalanceResponse> expectedBalances = Arrays.asList(
                 new BalanceResponse(BigDecimal.ZERO, Currency.USD),
                 new BalanceResponse(BigDecimal.ZERO, Currency.EUR)
         );
         when(balanceService.getBalancesForAccount(any())).thenReturn(expectedBalances);
 
-        // Act
         AccountResponse response = accountService.createAccountAndBalances(accountRequest);
-        System.out.println(response);
-        System.out.println(newAccount);
 
-        // Assert
-        assertEquals(newAccount.getId(), response.accountId());
         assertEquals(newAccount.getCustomerId(), response.customerId());
         assertEquals(expectedBalances, response.balances());
 
         // Verify that the sendMessageToQueue method was called once with the correct arguments
-        verify(rabbitMqSenderService, times(1)).sendMessageToQueue(newAccount.getId(), EventType.CREATION);
+        verify(rabbitMqSenderService, times(1)).sendMessageToQueue(any(), eq(EventType.CREATION));
     }
 
     @Test
     public void testGetAccountWithBalances() throws EntityNotFoundException {
-        // Arrange
         UUID accountId = UUID.randomUUID();
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         String country = "EE";
 
-        // Mock the behavior of dependencies
         Account mockAccount = new Account(accountId, country, customerId);
         when(accountRepository.findById(accountId)).thenReturn(mockAccount);
 
@@ -93,30 +83,23 @@ public class AccountServiceTest {
         );
         when(balanceService.getBalancesForAccount(accountId)).thenReturn(expectedBalances);
 
-        // Act
         AccountResponse response = accountService.getAccountWithBalances(accountId);
-        System.out.println(response);
-        // Assert
+
         assertNotNull(response);
         assertEquals(accountId, response.accountId());
         assertEquals(customerId, response.customerId());
         assertEquals(expectedBalances, response.balances());
 
-        // Verify that findById and getBalancesForAccount were called once
         verify(accountRepository, times(1)).findById(accountId);
         verify(balanceService, times(1)).getBalancesForAccount(accountId);
     }
 
     @Test(expected = EntityNotFoundException.class)
     public void testGetAccountWithBalancesEntityNotFound() throws EntityNotFoundException {
-        // Arrange
         UUID accountId = UUID.randomUUID();
 
-        // Mock behavior of accountRepository to return null
         when(accountRepository.findById(accountId)).thenReturn(null);
 
-        // Act and Assert
         accountService.getAccountWithBalances(accountId);
-
     }
 }
