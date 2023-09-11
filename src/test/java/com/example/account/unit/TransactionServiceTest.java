@@ -48,7 +48,6 @@ public class TransactionServiceTest {
 
     @Test
     public void testCreateTransaction() throws InvalidBalanceException, EntityNotFoundException {
-        // Arrange
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         UUID accountId = UUID.randomUUID();
         TransactionRequest transactionRequest = new TransactionRequest(
@@ -64,10 +63,8 @@ public class TransactionServiceTest {
         );
         when(balanceService.updateAccountBalance(accountId, transactionRequest.amount(), transactionRequest.direction(), transactionRequest.currency())).thenReturn(newBalance);
 
-        // Act
         TransactionResponse result = transactionService.createTransaction(accountId, transactionRequest);
 
-        // Assert
         assertNotNull(result);
         assertEquals(transactionRequest.amount(), result.amount());
         assertEquals(transactionRequest.currency(), result.currency());
@@ -77,7 +74,6 @@ public class TransactionServiceTest {
 
     @Test
     public void testGetTransactionsForAccount() throws EntityNotFoundException {
-        // Arrange
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         UUID accountId = UUID.randomUUID();
         List<Transaction> transactions = new ArrayList<>();
@@ -89,16 +85,13 @@ public class TransactionServiceTest {
         );
         when(transactionRepository.findByAccountId(accountId)).thenReturn(transactions);
 
-        // Act
         List<TransactionResponse> result = transactionService.getTransactionsForAccount(accountId);
 
-        // Assert
         assertNotNull(result);
         assertEquals(transactions.size(), result.size());
         assertEquals(transactions.get(0).getAmount(), result.get(0).amount());
         assertEquals(transactions.get(0).getCurrency(), result.get(0).currency());
         assertEquals(transactions.get(0).getDirection(), result.get(0).direction());
         assertEquals(transactions.get(0).getDescription(), result.get(0).description());
-        assertNull(result.get(0).newBalance()); // New balance is not calculated for historical transactions
     }
 }

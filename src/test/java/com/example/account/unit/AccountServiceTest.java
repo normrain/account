@@ -1,6 +1,5 @@
 package com.example.account.unit;
 
-import com.example.account.PostgresTestContainer;
 import com.example.account.domain.accounts.api.model.AccountRequest;
 import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.entity.Account;
@@ -64,7 +63,6 @@ public class AccountServiceTest {
         assertEquals(newAccount.getCustomerId(), response.customerId());
         assertEquals(expectedBalances, response.balances());
 
-        // Verify that the sendMessageToQueue method was called once with the correct arguments
         verify(rabbitMqSenderService, times(1)).sendMessageToQueue(any(), eq(EventType.CREATION));
     }
 

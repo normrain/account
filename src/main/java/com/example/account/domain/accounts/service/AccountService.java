@@ -51,11 +51,10 @@ public class AccountService {
 
     public AccountResponse getAccountWithBalances(UUID id) throws EntityNotFoundException {
         Account account = accountRepository.findById(id);
-        List<BalanceResponse> balances = balanceService.getBalancesForAccount(id);
-
         if(account == null) {
             throw new EntityNotFoundException("Account", id);
         }
+        List<BalanceResponse> balances = balanceService.getBalancesForAccount(id);
 
         return AccountResponse.builder()
                 .accountId(account.getId())

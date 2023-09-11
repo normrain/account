@@ -36,7 +36,10 @@ public class BalanceService {
     }
 
     public void createBalancesForAccount(UUID accountId, List<Currency> currencies){
-        for (Currency currency : currencies) {
+        List<Currency> distinctCurrencies = currencies.stream()
+                .distinct()
+                .toList();
+        for (Currency currency : distinctCurrencies) {
             Balance newBalance = Balance.builder()
                     .accountId(accountId)
                     .currency(currency)

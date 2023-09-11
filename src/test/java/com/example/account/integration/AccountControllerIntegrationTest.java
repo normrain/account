@@ -1,15 +1,13 @@
 package com.example.account.integration;
 
-import com.example.account.PostgresTestContainer;
-import com.example.account.RabbitTestContainer;
+import com.example.account.utils.PostgresTestContainer;
+import com.example.account.utils.RabbitTestContainer;
 import com.example.account.domain.accounts.api.model.AccountRequest;
-import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.service.AccountService;
 import com.example.account.domain.transactions.model.TransactionRequest;
 import com.example.account.util.enums.Currency;
 import com.example.account.util.enums.Direction;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -32,6 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class AccountControllerIntegrationTest {
 
     @ClassRule

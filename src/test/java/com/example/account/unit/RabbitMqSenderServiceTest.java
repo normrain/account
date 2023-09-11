@@ -35,7 +35,6 @@ public class RabbitMqSenderServiceTest {
 
     @Test
     public void testSendMessageToQueue() throws JsonProcessingException {
-        // Arrange
         UUID objectId = UUID.randomUUID();
         EventType eventType = EventType.CREATION;
         EventLog expectedEventLog = EventLog.builder()
@@ -47,10 +46,8 @@ public class RabbitMqSenderServiceTest {
         when(objectMapper.writeValueAsString(expectedEventLog)).thenReturn(jsonEventLog);
         when(queue.getName()).thenReturn("testQueue");
 
-        // Act
         rabbitMqSenderService.sendMessageToQueue(objectId, eventType);
 
-        // Assert
         verify(rabbitTemplate, times(1)).convertAndSend("testQueue", jsonEventLog);
     }
 

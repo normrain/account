@@ -1,4 +1,4 @@
-package com.example.account;
+package com.example.account.utils;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -23,7 +23,7 @@ public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestConta
     @Override
     public void start() {
         super.start();
-        System.setProperty("DB_URL", container.getJdbcUrl().substring(0,17));
+        System.setProperty("DB_URL", container.getJdbcUrl());
         System.setProperty("DB_USERNAME", container.getUsername());
         System.setProperty("DB_PASSWORD", container.getPassword());
     }

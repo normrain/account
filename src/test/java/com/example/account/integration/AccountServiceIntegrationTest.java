@@ -1,36 +1,30 @@
 package com.example.account.integration;
 
-import com.example.account.PostgresTestContainer;
-import com.example.account.RabbitTestContainer;
+import com.example.account.utils.PostgresTestContainer;
+import com.example.account.utils.RabbitTestContainer;
 import com.example.account.domain.accounts.api.model.AccountRequest;
 import com.example.account.domain.accounts.api.model.AccountResponse;
 import com.example.account.domain.accounts.entity.Account;
 import com.example.account.domain.accounts.repository.AccountRepository;
 import com.example.account.domain.accounts.service.AccountService;
+import com.example.account.domain.balances.model.BalanceResponse;
 import com.example.account.domain.balances.service.BalanceService;
 import com.example.account.util.enums.Currency;
 import com.example.account.util.enums.EventType;
 import com.example.account.util.exception.EntityNotFoundException;
 import com.example.account.service.RabbitMqSenderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
-import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -45,6 +39,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Testcontainers
+@ActiveProfiles("test")
 public class AccountServiceIntegrationTest {
 
     @ClassRule
@@ -65,9 +60,9 @@ public class AccountServiceIntegrationTest {
     private RabbitMqSenderService rabbitMqSenderService;
 
     @Test
-    public void testCreateAccountAndBalances() throws JsonProcessingException {
+    public void withValidAccountRequest_createsAccounts() throws JsonProcessingException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
-        AccountRequest accountRequest = new AccountRequest(customerId, "NL", Arrays.asList(Currency.USD, Currency.EUR));
+        AccountRequest accountRequest = new AccountRequest(customerId, "NL", List.of(Currency.USD, Currency.EUR));
 
         AccountResponse response = accountService.createAccountAndBalances(accountRequest);
 
@@ -80,8 +75,24 @@ public class AccountServiceIntegrationTest {
     }
 
     @Test
-    public void testGetAccountWithBalances() throws EntityNotFoundException {
-        // Set up test data in the database using accountRepository
+    public void withDuplicateCurrency_onlyCreatesOneBalanceForCurrency() throws JsonProcessingException {
+        Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
+        AccountRequest accountRequest = new AccountRequest(customerId, "NL", List.of(Currency.EUR, Currency.EUR));
+
+        AccountResponse response = accountService.createAccountAndBalances(accountRequest);
+
+        Account account = accountRepository.findById(response.accountId());
+        List<BalanceResponse> balances = balanceService.getBalancesForAccount(response.accountId());
+
+        assertNotNull(response);
+        assertNotNull(account);
+        assertEquals(1, balances.size());
+
+        verify(rabbitMqSenderService, times(2)).sendMessageToQueue(any(), eq(EventType.CREATION));
+    }
+
+    @Test
+    public void withExistingAccount_returnsAccount() throws EntityNotFoundException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         Account account = new Account(null, "NL", customerId);
         accountRepository.insert(account);
@@ -94,5 +105,11 @@ public class AccountServiceIntegrationTest {
         assertEquals(response.balances(), List.of());
     }
 
-    // Additional integration tests as needed for error cases, edge cases, etc.
+    @Test(expected = EntityNotFoundException.class)
+    public void withNotExistingAccount_throwsException() throws EntityNotFoundException {
+        UUID accountId = UUID.randomUUID();
+
+        accountService.getAccountWithBalances(accountId);
+
+    }
 }

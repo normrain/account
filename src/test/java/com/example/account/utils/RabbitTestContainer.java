@@ -1,9 +1,6 @@
-package com.example.account;
+package com.example.account.utils;
 
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
@@ -28,6 +25,8 @@ public class RabbitTestContainer extends RabbitMQContainer {
         super.start();
         System.setProperty("RMQ_HOST", container.getHost());
         System.setProperty("RMQ_PORT", container.getMappedPort(5672).toString());
+        System.setProperty("RMQ_USERNAME", container.getAdminUsername());
+        System.setProperty("RMQ_PASSWORD", container.getAdminPassword());
     }
 
     @Override

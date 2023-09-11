@@ -1,7 +1,7 @@
 package com.example.account.integration;
 
-import com.example.account.PostgresTestContainer;
-import com.example.account.RabbitTestContainer;
+import com.example.account.utils.PostgresTestContainer;
+import com.example.account.utils.RabbitTestContainer;
 import com.example.account.domain.balances.entity.Balance;
 import com.example.account.domain.balances.model.BalanceResponse;
 import com.example.account.domain.balances.repository.BalanceRepository;
@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("test")
 public class BalanceServiceIntegrationTest {
 
     @ClassRule
@@ -46,7 +48,7 @@ public class BalanceServiceIntegrationTest {
     private RabbitMqSenderService rabbitMqSenderService;
 
     @Test
-    public void testGetBalancesForAccount() {
+    public void withValidBalances_returnBalances() {
         UUID accountId = UUID.randomUUID();
 
         Balance balance1 = new Balance(UUID.randomUUID(), accountId, BigDecimal.ZERO, Currency.USD);
@@ -68,7 +70,7 @@ public class BalanceServiceIntegrationTest {
     }
 
     @Test
-    public void testCreateBalancesForAccount() {
+    public void withValidBalances_createBalances() {
         UUID accountId = UUID.randomUUID();
         List<Currency> currencies = List.of(Currency.USD, Currency.EUR);
 
@@ -91,7 +93,7 @@ public class BalanceServiceIntegrationTest {
     }
 
     @Test
-    public void testUpdateAccountBalance() throws InvalidBalanceException {
+    public void withValidBalanceAndValidTransactionDirection_updateBalance() throws InvalidBalanceException {
         UUID accountId = UUID.randomUUID();
         Balance balance = new Balance(null, accountId, null, Currency.USD);
         balanceRepository.insert(balance);
@@ -103,7 +105,7 @@ public class BalanceServiceIntegrationTest {
     }
 
     @Test(expected = InvalidBalanceException.class)
-    public void throwsException() throws InvalidBalanceException {
+    public void withValidBalanceAndInsufficientFunds_throwException() throws InvalidBalanceException {
         UUID accountId = UUID.randomUUID();
         Balance balance = new Balance(null, accountId, null, Currency.USD);
         balanceRepository.insert(balance);
@@ -113,4 +115,5 @@ public class BalanceServiceIntegrationTest {
         assertNotNull(newBalanceAmount);
         assertEquals(BigDecimal.valueOf(50.00).setScale(2, RoundingMode.HALF_UP), newBalanceAmount);
     }
+
 }
