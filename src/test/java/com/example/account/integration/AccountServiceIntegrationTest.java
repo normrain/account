@@ -62,14 +62,20 @@ public class AccountServiceIntegrationTest {
     @Test
     public void withValidAccountRequest_createsAccounts() throws JsonProcessingException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
-        AccountRequest accountRequest = new AccountRequest(customerId, "NL", List.of(Currency.USD, Currency.EUR));
+        String country = "NL";
+        AccountRequest accountRequest = new AccountRequest(customerId, country, List.of(Currency.USD, Currency.EUR));
 
         AccountResponse response = accountService.createAccountAndBalances(accountRequest);
 
         Account account = accountRepository.findById(response.accountId());
 
-        assertNotNull(response);
-        assertNotNull(account);
+        assertNotNull(response.accountId());
+        assertEquals(customerId, response.customerId());
+        assertEquals(2, response.balances().size());
+
+        assertNotNull(account.getId());
+        assertEquals(customerId, account.getCustomerId());
+        assertEquals(country, account.getCountry());
 
         verify(rabbitMqSenderService, times(3)).sendMessageToQueue(any(), eq(EventType.CREATION));
     }
@@ -77,7 +83,8 @@ public class AccountServiceIntegrationTest {
     @Test
     public void withDuplicateCurrency_onlyCreatesOneBalanceForCurrency() throws JsonProcessingException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
-        AccountRequest accountRequest = new AccountRequest(customerId, "NL", List.of(Currency.EUR, Currency.EUR));
+        String country = "NL";
+        AccountRequest accountRequest = new AccountRequest(customerId, country, List.of(Currency.EUR, Currency.EUR));
 
         AccountResponse response = accountService.createAccountAndBalances(accountRequest);
 
@@ -85,7 +92,13 @@ public class AccountServiceIntegrationTest {
         List<BalanceResponse> balances = balanceService.getBalancesForAccount(response.accountId());
 
         assertNotNull(response);
+        assertEquals(customerId, response.customerId());
+        assertEquals(1, response.balances().size());
+
         assertNotNull(account);
+        assertEquals(customerId, account.getCustomerId());
+        assertEquals(country, account.getCountry());
+
         assertEquals(1, balances.size());
 
         verify(rabbitMqSenderService, times(2)).sendMessageToQueue(any(), eq(EventType.CREATION));

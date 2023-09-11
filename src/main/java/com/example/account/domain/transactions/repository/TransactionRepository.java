@@ -11,13 +11,9 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository {
 
-    String SELECT_FROM_TRANSACTION_WHERE_ID = "SELECT * FROM transaction WHERE id = #{id}";
-
-    @Select("select * from transaction")
-    List<Transaction> findAll();
-
-    @Select(SELECT_FROM_TRANSACTION_WHERE_ID)
+    @Select("SELECT * FROM transaction WHERE id = #{id}")
     @Result(property = "customerId", column = "customer_id")
+    @Result(property = "accountId", column = "account_id")
     Transaction findById(UUID id);
 
     @Select("SELECT * FROM transaction WHERE account_id = #{accountId}")

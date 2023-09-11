@@ -42,24 +42,27 @@ public class AccountControllerTest {
     private TransactionService transactionService;
 
     @Test
-    public void testCreateAccount() throws JsonProcessingException {
+    public void withValidAccountRequest_createAccount() throws JsonProcessingException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
-        AccountRequest accountRequest = new AccountRequest(customerId, "NL", new ArrayList<>());
+        String country = "NL";
+        AccountRequest accountRequest = new AccountRequest(customerId, country, new ArrayList<>());
         AccountResponse expectedResponse = new AccountResponse(UUID.randomUUID(), customerId, new ArrayList<>());
 
         when(accountService.createAccountAndBalances(accountRequest)).thenReturn(expectedResponse);
 
         AccountResponse result = accountController.createAccount(accountRequest);
 
-        assertNotNull(result);
+        System.out.println(result);
+
+        assertNotNull(result.accountId());
         assertEquals(expectedResponse, result);
     }
 
     @Test
-    public void testCreateTransaction() throws InvalidBalanceException, EntityNotFoundException {
+    public void withValidTransactionRequest_createTransaction() throws InvalidBalanceException, EntityNotFoundException {
         UUID accountId = UUID.randomUUID();
         TransactionRequest transactionRequest = new TransactionRequest(
-                BigDecimal.TEN, // Provide appropriate transaction data
+                BigDecimal.TEN,
                 Currency.EUR,
                 Direction.IN,
                 "test description"
@@ -78,13 +81,12 @@ public class AccountControllerTest {
 
         TransactionResponse result = accountController.createTransaction(accountId, transactionRequest);
 
-System.out.println(result);
         assertNotNull(result);
         assertEquals(expectedResponse, result);
     }
 
     @Test
-    public void testGetAccount() throws EntityNotFoundException {
+    public void withExistingAccount_fetchAccount() throws EntityNotFoundException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         UUID accountId = UUID.randomUUID();
         AccountResponse expectedResponse = new AccountResponse(accountId, customerId, List.of());
@@ -98,7 +100,7 @@ System.out.println(result);
     }
 
     @Test
-    public void testGetTransactions() throws EntityNotFoundException {
+    public void withExistingTransaction_fetchTransaction() throws EntityNotFoundException {
         UUID accountId = UUID.randomUUID();
         List<TransactionResponse> expectedResponses = List.of(
                 new TransactionResponse(accountId, UUID.randomUUID(), BigDecimal.ONE, Currency.EUR, Direction.IN, "test description 1", null),
@@ -114,7 +116,7 @@ System.out.println(result);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void testCreateAccountValidationFailure() throws JsonProcessingException {
+    public void withInvalidAccountRequest_throwException() throws JsonProcessingException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         AccountRequest accountRequest = new AccountRequest(customerId, "", List.of());
 
@@ -124,7 +126,7 @@ System.out.println(result);
     }
 
     @Test(expected = MethodArgumentNotValidException.class)
-    public void testCreateTransactionValidationFailure() throws InvalidBalanceException, EntityNotFoundException {
+    public void withInvalidTransactionRequest_throwException() throws InvalidBalanceException, EntityNotFoundException {
         UUID accountId = UUID.randomUUID();
         TransactionRequest transactionRequest = new TransactionRequest(
                 null,
@@ -139,7 +141,7 @@ System.out.println(result);
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testGetAccountEntityNotFound() throws EntityNotFoundException {
+    public void withAccountNotExisting_throwExceptionForAccountFetching() throws EntityNotFoundException {
         UUID accountId = UUID.randomUUID();
         when(accountService.getAccountWithBalances(accountId)).thenThrow(EntityNotFoundException.class);
 
@@ -147,7 +149,7 @@ System.out.println(result);
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testGetTransactionsEntityNotFound() throws EntityNotFoundException {
+    public void withAccountNotExisting_throwExceptionForTransactionFetching() throws EntityNotFoundException {
         UUID accountId = UUID.randomUUID();
         when(transactionService.getTransactionsForAccount(accountId)).thenThrow(EntityNotFoundException.class);
 

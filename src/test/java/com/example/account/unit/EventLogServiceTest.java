@@ -30,7 +30,7 @@ public class EventLogServiceTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testSaveMessageToLog() throws JsonProcessingException {
+    public void withValidEventLog_createsEventLog() throws JsonProcessingException {
         String jsonMessage = "{\"objectId\":\"test_id\",\"eventType\":\"test_event\"}"; // Replace with your JSON message
         EventLog expectedEventLog = new EventLog(UUID.randomUUID(), EventType.CREATION, UUID.randomUUID());
 
@@ -42,7 +42,7 @@ public class EventLogServiceTest {
     }
 
     @Test(expected = JsonProcessingException.class)
-    public void testSaveMessageToLogJsonProcessingException() throws JsonProcessingException {
+    public void withInvalidEvenLog_throwsException() throws JsonProcessingException {
         String jsonMessage = "{\"objectId\":\"test_id\",\"eventType\":\"test_event\"}";
 
         when(objectMapper.readValue(jsonMessage, EventLog.class)).thenThrow(JsonProcessingException.class);

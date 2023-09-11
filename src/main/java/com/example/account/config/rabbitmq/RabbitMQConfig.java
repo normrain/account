@@ -21,6 +21,7 @@ import org.springframework.util.ErrorHandler;
 @EnableRabbit
 @Configuration
 public class RabbitMQConfig {
+
     @Value("${rabbitmq.queue}")
     private String queueName;
     @Value("${rabbitmq.exchange}")
@@ -41,23 +42,30 @@ public class RabbitMQConfig {
     private Integer concurrentConsumers;
     @Value("${rabbitmq.max.concurrent.consumers}")
     private Integer maxConcurrentConsumers;
+    @Value("${rabbitmq.port}")
+    private Integer port;
+
     @Bean
     public Queue queue() {
         return new Queue(queueName, false);
     }
+
     @Bean
     public DirectExchange exchange() {
         return new DirectExchange(exchange);
     }
+
     @Bean
     public Binding binding(Queue queue, DirectExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(routingkey);
     }
+
     @Bean
     public MessageConverter jsonMessageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
         return new Jackson2JsonMessageConverter(objectMapper);
     }
+
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
@@ -67,6 +75,7 @@ public class RabbitMQConfig {
         connectionFactory.setPassword(password);
         return connectionFactory;
     }
+
     @Bean
     public AmqpTemplate rabbitAmqTemplate(ConnectionFactory connectionFactory) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
@@ -77,10 +86,12 @@ public class RabbitMQConfig {
         rabbitTemplate.setUseDirectReplyToContainer(false);
         return rabbitTemplate;
     }
+
     @Bean
     public AmqpAdmin amqpAdmin() {
         return new RabbitAdmin(connectionFactory());
     }
+
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
         final SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
@@ -91,6 +102,7 @@ public class RabbitMQConfig {
         factory.setErrorHandler(errorHandler());
         return factory;
     }
+
     @Bean
     public ErrorHandler errorHandler() {
         return new ConditionalRejectingErrorHandler(new MyFatalExceptionStrategy());

@@ -37,7 +37,7 @@ public class BalanceServiceTest {
     private RabbitMqSenderService rabbitMqSenderService;
 
     @Test
-    public void testGetBalancesForAccount() {
+    public void withExistingBalances_returnsBalances() {
         UUID accountId = UUID.randomUUID();
         List<Balance> balances = Arrays.asList(
                 new Balance(UUID.randomUUID(), accountId, BigDecimal.valueOf(100.00), Currency.USD),
@@ -57,7 +57,7 @@ public class BalanceServiceTest {
     }
 
     @Test
-    public void testCreateBalancesForAccount() {
+    public void withValidBalance_createsBalanceForAccount() {
         UUID accountId = UUID.randomUUID();
         List<Currency> currencies = List.of(Currency.USD, Currency.EUR);
 
@@ -68,7 +68,7 @@ public class BalanceServiceTest {
     }
 
     @Test
-    public void testUpdateAccountBalance() throws InvalidBalanceException {
+    public void withValidTransaction_updatesBalanceAmount() throws InvalidBalanceException {
         UUID accountId = UUID.randomUUID();
         Currency currency = Currency.USD;
         Balance balance = new Balance(UUID.randomUUID(), accountId, BigDecimal.valueOf(100.00), currency);
@@ -86,7 +86,7 @@ public class BalanceServiceTest {
     }
 
     @Test(expected = InvalidBalanceException.class)
-    public void testUpdateAccountBalanceInsufficientFunds() throws InvalidBalanceException {
+    public void withInvlaidTransaction_throwsException() throws InvalidBalanceException {
         UUID accountId = UUID.randomUUID();
         Currency currency = Currency.USD;
         Balance balance = new Balance(UUID.randomUUID(), accountId, BigDecimal.valueOf(100.00), currency);

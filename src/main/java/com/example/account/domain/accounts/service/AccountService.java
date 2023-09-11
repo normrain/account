@@ -12,6 +12,7 @@ import com.example.account.service.RabbitMqSenderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final RabbitMqSenderService rabbitMqSenderService;
 
+    @Transactional
     public AccountResponse createAccountAndBalances(AccountRequest accountRequest) throws JsonProcessingException {
 
         Account newAccount = Account.builder()

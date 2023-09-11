@@ -47,7 +47,7 @@ public class TransactionServiceTest {
     private RabbitMqSenderService rabbitMqSenderService;
 
     @Test
-    public void testCreateTransaction() throws InvalidBalanceException, EntityNotFoundException {
+    public void withValidTransactionRequest_createsTransaction() throws InvalidBalanceException, EntityNotFoundException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         UUID accountId = UUID.randomUUID();
         TransactionRequest transactionRequest = new TransactionRequest(
@@ -73,7 +73,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void testGetTransactionsForAccount() throws EntityNotFoundException {
+    public void withExistingAccount_fetchesTransactions() throws EntityNotFoundException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         UUID accountId = UUID.randomUUID();
         List<Transaction> transactions = new ArrayList<>();
@@ -93,5 +93,15 @@ public class TransactionServiceTest {
         assertEquals(transactions.get(0).getCurrency(), result.get(0).currency());
         assertEquals(transactions.get(0).getDirection(), result.get(0).direction());
         assertEquals(transactions.get(0).getDescription(), result.get(0).description());
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void withNonExistingAccount_throwsException() throws EntityNotFoundException {
+        UUID accountId = UUID.randomUUID();
+
+        when(accountService.getAccountWithBalances(accountId)).thenThrow(EntityNotFoundException.class);
+
+        transactionService.getTransactionsForAccount(accountId);
+
     }
 }

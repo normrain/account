@@ -12,6 +12,7 @@ import com.example.account.util.exception.InvalidBalanceException;
 import com.example.account.service.RabbitMqSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,6 +28,7 @@ public class TransactionService {
     private final AccountService accountService;
     private final RabbitMqSenderService rabbitMqSenderService;
 
+    @Transactional
     public TransactionResponse createTransaction(UUID accountId, TransactionRequest transactionRequest) throws InvalidBalanceException, EntityNotFoundException {
         accountService.getAccountWithBalances(accountId);
 

@@ -13,15 +13,11 @@ import java.util.UUID;
 @Repository
 public interface BalanceRepository {
 
-    @Select("SELECT * FROM balance WHERE id = #{id}")
-    @Result(property = "accountId", column = "account_id")
-    Balance findById(UUID id);
-
-    @Select("select * from balance where account_id = #{id}")
+    @Select("SELECT * FROM balance WHERE account_id = #{id}")
     @Result(property = "accountId", column = "account_id")
     List<Balance> findByAccountId(UUID accountID);
 
-    @Select("select * from balance where account_id = #{accountId} and currency = #{currency}")
+    @Select("SELECT * FROM balance WHERE account_id = #{accountId} AND currency = #{currency}")
     @Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
     @Result(property = "accountId", column = "account_id")
     Balance findByAccountIdAndCurrency(UUID accountId, Currency currency);
@@ -30,6 +26,6 @@ public interface BalanceRepository {
     @Options(useGeneratedKeys=true, keyProperty="id", keyColumn="id")
     void insert(Balance balance);
 
-    @Update("Update balance set balance=#{balance} where id=#{id}")
+    @Update("UPDATE balance SET balance=#{balance} WHERE id=#{id}")
     void updateBalance(UUID id, BigDecimal balance);
 }

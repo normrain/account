@@ -97,7 +97,6 @@ public class BalanceServiceIntegrationTest {
         UUID accountId = UUID.randomUUID();
         Balance balance = new Balance(null, accountId, null, Currency.USD);
         balanceRepository.insert(balance);
-        System.out.println(balanceRepository.findById(balance.getId()));
         BigDecimal newBalanceAmount = balanceService.updateAccountBalance(accountId, BigDecimal.valueOf(50.00), Direction.IN, Currency.USD);
 
         assertNotNull(newBalanceAmount);
@@ -109,7 +108,7 @@ public class BalanceServiceIntegrationTest {
         UUID accountId = UUID.randomUUID();
         Balance balance = new Balance(null, accountId, null, Currency.USD);
         balanceRepository.insert(balance);
-        System.out.println(balanceRepository.findById(balance.getId()));
+
         BigDecimal newBalanceAmount = balanceService.updateAccountBalance(accountId, BigDecimal.valueOf(50.00), Direction.OUT, Currency.USD);
 
         assertNotNull(newBalanceAmount);

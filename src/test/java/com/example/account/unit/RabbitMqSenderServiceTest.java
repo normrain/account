@@ -34,7 +34,7 @@ public class RabbitMqSenderServiceTest {
     private Queue queue;
 
     @Test
-    public void testSendMessageToQueue() throws JsonProcessingException {
+    public void withValidMessage_sendsMessageToQueue() throws JsonProcessingException {
         UUID objectId = UUID.randomUUID();
         EventType eventType = EventType.CREATION;
         EventLog expectedEventLog = EventLog.builder()
@@ -52,7 +52,7 @@ public class RabbitMqSenderServiceTest {
     }
 
     @Test
-    public void testSendMessageToQueueJsonProcessingException() throws JsonProcessingException {
+    public void withInvalidMessage_throwsException() throws JsonProcessingException {
         UUID objectId = UUID.randomUUID();
         EventType eventType = EventType.CREATION;
 

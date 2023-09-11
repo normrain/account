@@ -45,7 +45,7 @@ public class AccountServiceTest {
     private RabbitMqSenderService rabbitMqSenderService;
 
     @Test
-    public void testCreateAccountAndBalances() throws JsonProcessingException {
+    public void withValidAccountRequest_createsAccountAndBalances() throws JsonProcessingException {
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         String country = "EE";
         UUID accountID = UUID.randomUUID();
@@ -67,7 +67,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testGetAccountWithBalances() throws EntityNotFoundException {
+    public void withExistingAccount_returnsAccount() throws EntityNotFoundException {
         UUID accountId = UUID.randomUUID();
         Long customerId = ThreadLocalRandom.current().nextLong(0, 1001);
         String country = "EE";
@@ -93,7 +93,7 @@ public class AccountServiceTest {
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testGetAccountWithBalancesEntityNotFound() throws EntityNotFoundException {
+    public void withNonExistingAccount_throwsException() throws EntityNotFoundException {
         UUID accountId = UUID.randomUUID();
 
         when(accountRepository.findById(accountId)).thenReturn(null);

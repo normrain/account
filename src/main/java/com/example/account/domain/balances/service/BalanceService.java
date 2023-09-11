@@ -11,6 +11,7 @@ import com.example.account.util.exception.InvalidBalanceException;
 import com.example.account.service.RabbitMqSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,6 +36,7 @@ public class BalanceService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void createBalancesForAccount(UUID accountId, List<Currency> currencies){
         List<Currency> distinctCurrencies = currencies.stream()
                 .distinct()
@@ -49,6 +51,7 @@ public class BalanceService {
         }
     }
 
+    @Transactional
     public BigDecimal updateAccountBalance(UUID accountId, BigDecimal amount, Direction direction, Currency currency) throws InvalidBalanceException {
         Balance balance = balanceRepository.findByAccountIdAndCurrency(accountId, currency);
         if(balance == null) {

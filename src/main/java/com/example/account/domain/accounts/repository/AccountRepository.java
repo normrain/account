@@ -12,12 +12,7 @@ import java.util.UUID;
 @Repository
 public interface AccountRepository {
 
-    String SELECT_FROM_ACCOUNT_WHERE_ID = "SELECT * FROM account WHERE id = #{id}";
-
-    @Select("select * from account")
-    List<Account> findAll();
-
-    @Select(SELECT_FROM_ACCOUNT_WHERE_ID)
+    @Select("SELECT * FROM account WHERE id = #{id}")
     @Result(property = "customerId", column = "customer_id")
     Account findById(UUID id);
 
