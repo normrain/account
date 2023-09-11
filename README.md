@@ -6,7 +6,7 @@ After running the docker-compose file (`docker-compose up`), the application its
 The repository also includes a docker file. The docker file will build the application's jar file and launch the container.
 The container itself exposes port `8080`, which will need to be bound before the API can be accessed.
 
-The build process and start-up will also run the Liquibase migrations to create the necessary tables.
+At application start-up the Liquibase migrations will run to create the necessary tables.
 
 N.B. The application-properties use `host.docker.internal`, to allow the application container to connect to the infrastructure. The project was built on Microsoft Windows using Docker for Desktop. This internal host may not work on Linux
 
@@ -56,7 +56,7 @@ There are no endpoints for balances as there is no need to create or modify them
 MyBatis was given as a requirement to be used. I use the autoconfiguration, as this should be enough for what I require.
 I have not used MyBatis in my work so far (I used mostly Hibernate & Exposed for newer Kotlin projects), and I saw that there is XMl mapping & configurations, however, for the queries I require, I decided to only use Annotation-based mapping.
 
-For dtabase migrations, I have used Liquibase. The other option I had in mind was flyway, which I use at work. However, to experience something new, I have decided to go with Liquibase.
+For database migrations, I have used Liquibase. The other option I had in mind was flyway, which I use at work. However, to experience something new, I have decided to go with Liquibase.
 
 ### RabbitMQ
 RabbitMQ (as well as the management UI), has been configured and a service has been create to send out messages. 
