@@ -10,6 +10,8 @@ At application start-up the Liquibase migrations will run to create the necessar
 
 N.B. The application-properties use `host.docker.internal`, to allow the application container to connect to the infrastructure. The project was built on Microsoft Windows using Docker for Desktop. This internal host may not work on Linux
 
+Alternatively, to run the application locally, it needs to be run with the profile "localhost".
+
 ## Documentation
 
 The API documentation can be found at `localhost:[BOUND_PORT]/swagger-ui.html` once the application is started (`BOUND_PORT` being the port the container is accessible from)
